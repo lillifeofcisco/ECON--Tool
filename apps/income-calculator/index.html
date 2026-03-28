@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Income Calculator</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #1f2937;
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --accent: #38bdf8;
+      --good: #22c55e;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, var(--bg), #1e293b);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      margin-bottom: 8px;
+      font-size: 2rem;
+    }
+
+    .hero p {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(17, 24, 39, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+    }
+
+    label {
+      display: block;
+      margin: 14px 0 6px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0b1220;
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: #082f49;
+    }
+
+    .secondary {
+      background: #334155;
+      color: var(--text);
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .result-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .result-box .label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .result-box .value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--good);
+    }
+
+    .note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .grid, .result-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <h1>Income Calculator App</h1>
+      <p>Estimate gross and net income from hourly pay, work schedule, tax rate, bonus, and deductions.</p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Enter your details</h2>
+
+        <label for="currency">Currency symbol</label>
+        <input id="currency" type="text" value="$" maxlength="4" />
+
+        <label for="hourlyRate">Hourly rate</label>
+        <input id="hourlyRate" type="number" min="0" step="0.01" value="20" />
+
+        <label for="hoursPerDay">Hours worked per day</label>
+        <input id="hoursPerDay" type="number" min="0" step="0.1" value="8" />
+
+        <label for="daysPerWeek">Days worked per week</label>
+        <input id="daysPerWeek" type="number" min="0" step="1" value="5" />
+
+        <label for="weeksPerMonth">Average weeks per month</label>
+        <input id="weeksPerMonth" type="number" min="0" step="0.01" value="4.33" />
+
+        <label for="taxRate">Tax rate (%)</label>
+        <input id="taxRate" type="number" min="0" max="100" step="0.1" value="10" />
+
+        <label for="monthlyBonus">Monthly bonus</label>
+        <input id="monthlyBonus" type="number" min="0" step="0.01" value="0" />
+
+        <label for="monthlyDeductions">Monthly deductions</label>
+        <input id="monthlyDeductions" type="number" min="0" step="0.01" value="0" />
+
+        <div class="buttons">
+          <button class="primary" onclick="calculateIncome()">Calculate</button>
+          <button class="secondary" onclick="resetForm()">Reset</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Results</h2>
+        <div class="result-grid">
+          <div class="result-box">
+            <div class="label">Daily income</div>
+            <div class="value" id="dailyIncome">$0.00</div>
+          </div>
+          <div class="result-box">
+            <div class="label">Weekly income</div>
+            <div class="value" id="weeklyIncome">$0.00</div>
+          </div>
+          <div class="result-box">
+            <div class="label">Monthly gross income</div>
+            <div class="value" id="monthlyGross">$0.00</div>
+          </div>
+          <div class="result-box">
+            <div class="label">Monthly net income</div>
+            <div class="value" id="monthlyNet">$0.00</div>
+          </div>
+          <div class="result-box">
+            <div class="label">Yearly gross income</div>
+            <div class="value" id="yearlyGross">$0.00</div>
+          </div>
+          <div class="result-box">
+            <div class="label">Yearly net income</div>
+            <div class="value" id="yearlyNet">$0.00</div>
+          </div>
+        </div>
+
+        <div class="note" id="summaryText">
+          Fill in the values and click calculate. Miraculously, arithmetic still works when wrapped in a shiny interface.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function money(value, currency) {
+      return `${currency}${Number(value).toFixed(2)}`;
+    }
+
+    function calculateIncome() {
+      const currency = document.getElementById('currency').value || '$';
+      const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+      const hoursPerDay = parseFloat(document.getElementById('hoursPerDay').value) || 0;
+      const daysPerWeek = parseFloat(document.getElementById('daysPerWeek').value) || 0;
+      const weeksPerMonth = parseFloat(document.getElementById('weeksPerMonth').value) || 0;
+      const taxRate = (parseFloat(document.getElementById('taxRate').value) || 0) / 100;
+      const monthlyBonus = parseFloat(document.getElementById('monthlyBonus').value) || 0;
+      const monthlyDeductions = parseFloat(document.getElementById('monthlyDeductions').value) || 0;
+
+      const dailyIncome = hourlyRate * hoursPerDay;
+      const weeklyIncome = dailyIncome * daysPerWeek;
+      const monthlyGross = weeklyIncome * weeksPerMonth + monthlyBonus;
+      const monthlyTax = monthlyGross * taxRate;
+      const monthlyNet = monthlyGross - monthlyTax - monthlyDeductions;
+      const yearlyGross = monthlyGross * 12;
+      const yearlyNet = monthlyNet * 12;
+
+      document.getElementById('dailyIncome').textContent = money(dailyIncome, currency);
+      document.getElementById('weeklyIncome').textContent = money(weeklyIncome, currency);
+      document.getElementById('monthlyGross').textContent = money(monthlyGross, currency);
+      document.getElementById('monthlyNet').textContent = money(monthlyNet, currency);
+      document.getElementById('yearlyGross').textContent = money(yearlyGross, currency);
+      document.getElementById('yearlyNet').textContent = money(yearlyNet, currency);
+
+      document.getElementById('summaryText').textContent =
+        `Gross monthly income is ${money(monthlyGross, currency)}. After tax and deductions, estimated net monthly income is ${money(monthlyNet, currency)}.`;
+    }
+
+    function resetForm() {
+      document.getElementById('currency').value = '$';
+      document.getElementById('hourlyRate').value = 20;
+      document.getElementById('hoursPerDay').value = 8;
+      document.getElementById('daysPerWeek').value = 5;
+      document.getElementById('weeksPerMonth').value = 4.33;
+      document.getElementById('taxRate').value = 10;
+      document.getElementById('monthlyBonus').value = 0;
+      document.getElementById('monthlyDeductions').value = 0;
+      calculateIncome();
+    }
+
+    calculateIncome();
+  </script>
+</body>
+</html>
